@@ -1,0 +1,19 @@
+{
+  "name": "Twitter GIF Saver",
+  "short_name": "GIF Saver",
+  "description": "Twitter(X)のURLから動画・GIFを抽出して保存するツールです。",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f9fafb",
+  "theme_color": "#1DA1F2",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
+
+
