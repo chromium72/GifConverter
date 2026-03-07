@@ -1,9 +1,12 @@
-Gemini(スマホ環境)で作成
+# はじめに
+Gemini(スマホ)で作成しました。
 
-いつかモジュールに分割したい(html, css, js/勉強がてらts?)
+いつかモジュールに分割したいね(html, css, js/勉強がてらts?)
 
 # Twitter(X) GIF Saver 🐦 🎬
 Twitter (X) のツイートURLから、アップロードされたGIF画像（内部的にはMP4形式）や動画を抽出し、ブラウザ上で手軽にダウンロード・変換できるWebツールです。
+
+URL：https://chromium72.github.io/GifConverter/index.html
 
 現在のTwitterの仕様である「1つのツイートに複数の動画やGIFが添付されているケース（最大4つ）」にも完全対応しています。
 ## ✨ 機能一覧
