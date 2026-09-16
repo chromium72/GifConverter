@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,16 +8,16 @@
     <meta name="referrer" content="no-referrer">
     <title>Twitter(X) GIF Saver</title>
     <meta name="description" content="Twitter(新:X)のURLからMP4/GIFに変換">
-    
+
     <!-- PWA用: マニフェストファイルの読み込み -->
-    <link rel="manifest" href="manifest.json">
-    
+    <link rel="manifest" href="./manifest.json">
+
     <!-- PWA用: テーマカラーとiOS向け設定 -->
     <meta name="theme-color" content="#1DA1F2">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="GIF Saver">
-    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="apple-touch-icon" href="./icon.png">
 
     <!-- Tailwind CSSの読み込み -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -24,44 +25,11 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- GIF変換ライブラリ (gifshot) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gifshot/0.3.2/gifshot.min.js"></script>
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        twitter: '#1DA1F2',
-                        x: '#000000',
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        /* ローディングスピナーのアニメーション */
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border-left-color: #1DA1F2;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* スクロールバーを隠すユーティリティクラス */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-    </style>
+
+    <script src="./js/tailwind-config.js"></script>
+    <link rel="stylesheet" href="./css/style.css">
 </head>
+
 <body class="bg-gray-50 min-h-[100dvh] overflow-y-auto flex items-center justify-center p-4 text-gray-800">
 
     <div class="max-w-lg w-full bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
@@ -85,14 +53,13 @@
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <i class="fa-solid fa-link text-gray-400"></i>
                         </div>
-                        <input type="text" id="tweetUrl" 
+                        <input type="text" id="tweetUrl"
                             class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-twitter focus:border-twitter transition-colors text-sm"
-                            placeholder="https://x.com/user/status/123456789..."
-                            autocomplete="off">
+                            placeholder="https://x.com/user/status/123456789..." autocomplete="off">
                     </div>
                 </div>
-                
-                <button id="fetchBtn" onclick="fetchMedia()" 
+
+                <button id="fetchBtn" onclick="fetchMedia()"
                     class="w-full bg-twitter hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform active:scale-95">
                     <i class="fa-solid fa-magnifying-glass"></i> 抽出する
                 </button>
@@ -113,21 +80,26 @@
                     <h3 class="text-sm font-bold text-gray-700 flex items-center gap-2">
                         <i class="fa-solid fa-image text-twitter"></i> プレビュー
                     </h3>
-                    <span id="mediaTypeBadge" class="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-md font-semibold hidden"></span>
+                    <span id="mediaTypeBadge"
+                        class="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-md font-semibold hidden"></span>
                 </div>
-                
+
                 <!-- メインプレビューコンテナ (スワイプ対応) -->
-                <div id="mainPreviewContainer" class="relative bg-black rounded-xl overflow-hidden aspect-video flex items-center justify-center mb-2 shadow-inner touch-pan-y">
+                <div id="mainPreviewContainer"
+                    class="relative bg-black rounded-xl overflow-hidden aspect-video flex items-center justify-center mb-2 shadow-inner touch-pan-y">
                     <video id="mediaPreview" class="max-w-full max-h-full" controls loop muted playsinline></video>
                     <!-- メディアカウンター -->
-                    <div id="mediaCounter" class="absolute top-3 right-3 bg-black bg-opacity-70 text-white text-xs px-3 py-1 rounded-full font-bold shadow hidden pointer-events-none z-10">
+                    <div id="mediaCounter"
+                        class="absolute top-3 right-3 bg-black bg-opacity-70 text-white text-xs px-3 py-1 rounded-full font-bold shadow hidden pointer-events-none z-10">
                         1 / 1
                     </div>
                     <!-- 左右のスワイプナビゲーションヒント (複数ある場合のみ表示) -->
-                    <button id="prevBtn" onclick="selectMedia(currentIndex - 1)" class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hidden hover:bg-opacity-80 transition z-10">
+                    <button id="prevBtn" onclick="selectMedia(currentIndex - 1)"
+                        class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hidden hover:bg-opacity-80 transition z-10">
                         <i class="fa-solid fa-chevron-left"></i>
                     </button>
-                    <button id="nextBtn" onclick="selectMedia(currentIndex + 1)" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hidden hover:bg-opacity-80 transition z-10">
+                    <button id="nextBtn" onclick="selectMedia(currentIndex + 1)"
+                        class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hidden hover:bg-opacity-80 transition z-10">
                         <i class="fa-solid fa-chevron-right"></i>
                     </button>
                 </div>
@@ -139,11 +111,11 @@
 
                 <div class="space-y-4 mt-4">
                     <!-- MP4ダウンロードボタン -->
-                    <button id="downloadBtn" onclick="downloadVideo()" 
+                    <button id="downloadBtn" onclick="downloadVideo()"
                         class="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
-                        <i class="fa-solid fa-video"></i> MP4のまま保存 (高画質)
+                        <i class="fa-solid fa-video"></i> MP4で保存
                     </button>
-                    
+
                     <!-- 境界線 -->
                     <div class="relative flex py-2 items-center">
                         <div class="flex-grow border-t border-gray-200"></div>
@@ -152,21 +124,22 @@
                     </div>
 
                     <!-- GIF変換ボタン -->
-                    <button id="convertBtn" onclick="convertAndDownloadGif()" 
+                    <button id="convertBtn" onclick="convertAndDownloadGif()"
                         class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
-                        <i class="fa-solid fa-file-arrow-down"></i> 本物のGIFに変換して保存
+                        <i class="fa-solid fa-file-arrow-down"></i> GIFにして保存
                     </button>
-                    
+
                     <!-- 変換プログレス表示 -->
                     <div id="progressArea" class="hidden">
                         <div class="w-full bg-gray-200 rounded-full h-2.5 mb-1 overflow-hidden">
-                            <div id="progressBar" class="bg-green-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            <div id="progressBar" class="bg-green-600 h-2.5 rounded-full transition-all duration-300"
+                                style="width: 0%"></div>
                         </div>
                         <p id="progressText" class="text-xs text-center text-gray-500">変換準備中... (ブラウザ内で処理します)</p>
                     </div>
 
                     <!-- 別タブで開くリンク (フォールバック) -->
-                    <a id="openLinkBtn" target="_blank" rel="noopener noreferrer" 
+                    <a id="openLinkBtn" target="_blank" rel="noopener noreferrer"
                         class="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-bold py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm block text-center mt-2 disabled:opacity-50">
                         <i class="fa-solid fa-arrow-up-right-from-square"></i> ブラウザで開く
                     </a>
@@ -175,383 +148,13 @@
         </div>
     </div>
 
-    <script>
-        // --- PWAダミーService Worker ---
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                const swCode = `
-                    self.addEventListener('install', (e) => self.skipWaiting());
-                    self.addEventListener('activate', (e) => self.clients.claim());
-                    self.addEventListener('fetch', (e) => {});
-                `;
-                const blob = new Blob([swCode], { type: 'application/javascript' });
-                const swUrl = URL.createObjectURL(blob);
-                navigator.serviceWorker.register(swUrl).then(() => {
-                    console.log('PWA Ready');
-                }).catch(err => console.log('SW Error:', err));
-            });
-        }
-
-        // --- グローバル変数 ---
-        let mediaList = [];      // 抽出した動画/GIFのリスト
-        let currentIndex = 0;    // 現在選択されているメディアのインデックス
-        let currentTweetId = ''; // 現在のツイートID
-        let isProcessing = false;// ダウンロードまたは変換処理中フラグ
-
-        // --- UI表示制御関数 ---
-        function showMessage(text, type = 'error') {
-            const msgArea = document.getElementById('messageArea');
-            msgArea.className = 'mt-6 rounded-xl p-4 text-sm text-center block transition-all';
-            
-            if (type === 'error') {
-                msgArea.classList.add('bg-red-50', 'text-red-600', 'border', 'border-red-200');
-                msgArea.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> ${text}`;
-            } else if (type === 'success') {
-                msgArea.classList.add('bg-green-50', 'text-green-600', 'border', 'border-green-200');
-                msgArea.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> ${text}`;
-            } else if (type === 'info') {
-                msgArea.classList.add('bg-blue-50', 'text-blue-600', 'border', 'border-blue-200');
-                msgArea.innerHTML = `<i class="fa-solid fa-circle-info mr-1"></i> ${text}`;
-            }
-        }
-
-        function hideMessage() {
-            const msgArea = document.getElementById('messageArea');
-            msgArea.className = 'hidden';
-            msgArea.innerHTML = '';
-        }
-
-        function toggleUI(isLoading) {
-            document.getElementById('fetchBtn').disabled = isLoading;
-            document.getElementById('loadingArea').style.display = isLoading ? 'flex' : 'none';
-            if (isLoading) {
-                document.getElementById('resultArea').style.display = 'none';
-                hideMessage();
-            }
-        }
-
-        // --- データ取得ロジック ---
-        async function fetchMedia() {
-            if (isProcessing) return;
-
-            const urlInput = document.getElementById('tweetUrl').value.trim();
-            if (!urlInput) {
-                showMessage('URLを入力してください。');
-                return;
-            }
-
-            const regex = /(?:twitter\.com|x\.com)\/([^/]+)\/status\/(\d+)/;
-            const match = urlInput.match(regex);
-
-            if (!match) {
-                showMessage('有効なTwitter(X)のツイートURLを入力してください。');
-                return;
-            }
-
-            const username = match[1];
-            currentTweetId = match[2];
-
-            toggleUI(true);
-
-            try {
-                const apiUrl = `https://api.vxtwitter.com/${username}/status/${currentTweetId}`;
-                const response = await fetch(apiUrl);
-                
-                if (!response.ok) throw new Error('ツイートの取得に失敗しました。非公開アカウントの可能性があります。');
-
-                const data = await response.json();
-
-                if (!data.media_extended || data.media_extended.length === 0) {
-                    showMessage('このツイートにはメディアが含まれていません。');
-                    toggleUI(false);
-                    return;
-                }
-
-                // 動画とGIFのみを配列として抽出
-                mediaList = data.media_extended.filter(m => m.type === 'video' || m.type === 'gif');
-
-                if (mediaList.length === 0) {
-                    showMessage('このツイートには動画やGIFが含まれていません。（静止画のみ）');
-                    toggleUI(false);
-                    return;
-                }
-
-                currentIndex = 0; // 初期インデックスを0にリセット
-                
-                document.getElementById('resultArea').style.display = 'block';
-                
-                if (mediaList.length > 1) {
-                    showMessage(`${mediaList.length}件のメディアを検出しました。スワイプやタップで切り替えられます。`, 'success');
-                } else {
-                    showMessage('メディアの抽出に成功しました。', 'success');
-                }
-
-                renderPreview();
-
-            } catch (error) {
-                console.error(error);
-                showMessage(error.message || '通信エラーが発生しました。時間をおいて再度お試しください。');
-            } finally {
-                toggleUI(false);
-            }
-        }
-
-        // --- プレビュー表示ロジック ---
-        function renderPreview() {
-            const currentMedia = mediaList[currentIndex];
-            const videoElement = document.getElementById('mediaPreview');
-            const counterElement = document.getElementById('mediaCounter');
-            const thumbContainer = document.getElementById('thumbnailList');
-            const badgeElement = document.getElementById('mediaTypeBadge');
-            
-            // プレビューの更新
-            videoElement.src = currentMedia.url;
-            document.getElementById('openLinkBtn').href = currentMedia.url;
-            
-            // バッジの更新 (GIFか動画か)
-            badgeElement.style.display = 'block';
-            badgeElement.innerText = currentMedia.type === 'gif' ? 'GIF (MP4)' : '動画';
-
-            // 自動再生
-            videoElement.play().catch(e => console.log("自動再生ブロック"));
-
-            // 複数ある場合のUI制御
-            if (mediaList.length > 1) {
-                // カウンター
-                counterElement.innerText = `${currentIndex + 1} / ${mediaList.length}`;
-                counterElement.style.display = 'block';
-                
-                // 左右ボタン
-                document.getElementById('prevBtn').style.display = currentIndex > 0 ? 'block' : 'none';
-                document.getElementById('nextBtn').style.display = currentIndex < mediaList.length - 1 ? 'block' : 'none';
-
-                // サムネイルリストの生成
-                thumbContainer.style.display = 'flex';
-                thumbContainer.innerHTML = '';
-                
-                mediaList.forEach((m, i) => {
-                    const img = document.createElement('img');
-                    // サムネイル画像がない場合のフォールバック
-                    img.src = m.thumbnail_url || 'https://via.placeholder.com/150/000000/FFFFFF?text=Video';
-                    img.alt = `Thumbnail ${i + 1}`;
-                    
-                    // 選択中かどうかでスタイルを変更
-                    const baseClass = "flex-none w-16 h-16 md:w-20 md:h-20 object-cover rounded-lg cursor-pointer border-2 transition-all snap-start";
-                    const activeClass = i === currentIndex ? "border-twitter opacity-100 scale-105" : "border-transparent opacity-50 hover:opacity-80";
-                    img.className = `${baseClass} ${activeClass}`;
-                    
-                    // 処理中はクリック無効
-                    img.onclick = () => {
-                        if (!isProcessing) selectMedia(i);
-                    };
-                    
-                    thumbContainer.appendChild(img);
-                });
-                
-                // 選択されたサムネイルが見える位置までスクロール
-                const activeThumb = thumbContainer.children[currentIndex];
-                if (activeThumb) {
-                    activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-                }
-
-            } else {
-                counterElement.style.display = 'none';
-                thumbContainer.style.display = 'none';
-                document.getElementById('prevBtn').style.display = 'none';
-                document.getElementById('nextBtn').style.display = 'none';
-            }
-        }
-
-        // --- メディア切り替え処理 ---
-        function selectMedia(index) {
-            // 範囲外アクセスと処理中のロック
-            if (index < 0 || index >= mediaList.length || isProcessing || index === currentIndex) return;
-            currentIndex = index;
-            renderPreview();
-        }
-
-        // --- スワイプイベントの処理 ---
-        let touchStartX = 0;
-        let touchEndX = 0;
-        const previewContainer = document.getElementById('mainPreviewContainer');
-
-        previewContainer.addEventListener('touchstart', e => {
-            if (isProcessing) return;
-            touchStartX = e.changedTouches[0].screenX;
-        }, { passive: true });
-
-        previewContainer.addEventListener('touchend', e => {
-            if (isProcessing) return;
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        }, { passive: true });
-
-        function handleSwipe() {
-            const swipeThreshold = 50; // スワイプと判定する最低移動距離(px)
-            if (touchEndX < touchStartX - swipeThreshold) {
-                // 左にスワイプ -> 次の動画へ
-                if (currentIndex < mediaList.length - 1) selectMedia(currentIndex + 1);
-            }
-            if (touchEndX > touchStartX + swipeThreshold) {
-                // 右にスワイプ -> 前の動画へ
-                if (currentIndex > 0) selectMedia(currentIndex - 1);
-            }
-        }
-
-        // --- 状態ロック関数 ---
-        function setProcessingState(processing) {
-            isProcessing = processing;
-            const elements = ['downloadBtn', 'convertBtn', 'openLinkBtn', 'fetchBtn', 'tweetUrl'];
-            elements.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.disabled = processing;
-            });
-            
-            // サムネイルの透明度を下げて操作不可を視覚化
-            const thumbContainer = document.getElementById('thumbnailList');
-            if (thumbContainer) {
-                thumbContainer.style.opacity = processing ? '0.5' : '1';
-                thumbContainer.style.pointerEvents = processing ? 'none' : 'auto';
-            }
-        }
-
-        // --- ダウンロード・変換ロジック ---
-        async function downloadVideo() {
-            if (mediaList.length === 0 || isProcessing) return;
-            setProcessingState(true);
-
-            const targetUrl = mediaList[currentIndex].url;
-            // 複数ある場合はファイル名に _1, _2 などを付ける
-            const suffix = mediaList.length > 1 ? `_${currentIndex + 1}` : '';
-            const fileName = `twitter_video_${currentTweetId}${suffix}.mp4`;
-
-            const downloadBtn = document.getElementById('downloadBtn');
-            const originalHtml = downloadBtn.innerHTML;
-            
-            try {
-                downloadBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 取得中...';
-
-                const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`;
-                const response = await fetch(proxyUrl);
-                if (!response.ok) throw new Error('データ取得失敗');
-                
-                const blob = await response.blob();
-                const blobUrl = window.URL.createObjectURL(blob);
-                
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = blobUrl;
-                a.download = fileName;
-                
-                document.body.appendChild(a);
-                a.click();
-                
-                setTimeout(() => {
-                    window.URL.revokeObjectURL(blobUrl);
-                    document.body.removeChild(a);
-                }, 100);
-                
-            } catch (error) {
-                console.error('Download error:', error);
-                showMessage('直接ダウンロードに失敗しました。ブラウザで開きますので、右クリック等から保存してください。', 'error');
-                setTimeout(() => window.open(targetUrl, '_blank'), 1500);
-            } finally {
-                downloadBtn.innerHTML = originalHtml;
-                setProcessingState(false);
-            }
-        }
-
-        async function convertAndDownloadGif() {
-            if (mediaList.length === 0 || isProcessing) return;
-            setProcessingState(true);
-
-            const targetUrl = mediaList[currentIndex].url;
-            const suffix = mediaList.length > 1 ? `_${currentIndex + 1}` : '';
-            const fileName = `twitter_converted_${currentTweetId}${suffix}.gif`;
-
-            const convertBtn = document.getElementById('convertBtn');
-            const progressArea = document.getElementById('progressArea');
-            const progressBar = document.getElementById('progressBar');
-            const progressText = document.getElementById('progressText');
-            const videoElement = document.getElementById('mediaPreview');
-
-            try {
-                convertBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 準備中...';
-                progressArea.classList.remove('hidden');
-                progressBar.style.width = '0%';
-                progressText.innerText = '動画データを取得中...';
-
-                const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`;
-                const response = await fetch(proxyUrl);
-                if (!response.ok) throw new Error('動画データの取得に失敗');
-                const blob = await response.blob();
-                const blobUrl = window.URL.createObjectURL(blob);
-
-                const duration = videoElement.duration && isFinite(videoElement.duration) ? videoElement.duration : 5;
-                
-                let width = videoElement.videoWidth || 320;
-                let height = videoElement.videoHeight || 320;
-                const maxWidth = 320;
-                if (width > maxWidth) {
-                    const ratio = maxWidth / width;
-                    width = maxWidth;
-                    height = Math.floor(height * ratio);
-                }
-
-                const fps = 10;
-                const numFrames = Math.floor(duration * fps);
-
-                progressText.innerText = 'ブラウザ内でGIFに変換中... (処理中は切り替えできません)';
-                convertBtn.innerHTML = '<i class="fa-solid fa-gears fa-spin"></i> 変換処理中...';
-
-                gifshot.createGIF({
-                    video: [blobUrl],
-                    gifWidth: width,
-                    gifHeight: height,
-                    numFrames: numFrames,
-                    frameDuration: 10,
-                    sampleInterval: 10,
-                    progressCallback: function(captureProgress) {
-                        const percent = Math.floor(captureProgress * 100);
-                        progressBar.style.width = percent + '%';
-                        if (percent > 95) {
-                            progressText.innerText = '最終エンコード中...';
-                        }
-                    }
-                }, function(obj) {
-                    window.URL.revokeObjectURL(blobUrl);
-                    progressArea.classList.add('hidden');
-
-                    if (!obj.error) {
-                        const base64Image = obj.image;
-                        const a = document.createElement('a');
-                        a.href = base64Image;
-                        a.download = fileName;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-
-                        convertBtn.innerHTML = '<i class="fa-solid fa-check"></i> 変換完了！';
-                        setTimeout(() => resetConvertBtn(), 3000);
-                    } else {
-                        throw new Error('エンコードに失敗しました');
-                    }
-                });
-
-            } catch (error) {
-                console.error('GIF Convert error:', error);
-                showMessage('GIFへの変換に失敗しました。動画サイズが大きいか非対応の形式です。<br>詳細: ' + error.message, 'error');
-                resetConvertBtn();
-            }
-
-            function resetConvertBtn() {
-                convertBtn.innerHTML = '<i class="fa-solid fa-file-arrow-down"></i> 本物のGIFに変換して保存';
-                setProcessingState(false);
-                progressArea.classList.add('hidden');
-            }
-        }
-    </script>
+    <!-- 分割したJSファイルの読み込み -->
+    <script src="./js/state.js"></script>
+    <script src="./js/ui.js"></script>
+    <script src="./js/preview.js"></script>
+    <script src="./js/api.js"></script>
+    <script src="./js/media.js"></script>
+    <script src="./js/pwa.js"></script>
 </body>
+
 </html>
-
-
